@@ -1,35 +1,49 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { AppService } from './app.service';
+import { CreateProductDto } from './dto/create-product.dto';
+import { ProductDto } from './dto/product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  // @Get()
-  // getHello(): string {
-  //   return this.appService.getHello();
-  // }
-
   @Get()
-  async getProducts() {
+  @HttpCode(HttpStatus.OK)
+  async getProducts(): Promise<ProductDto[]> {
     return this.appService.getProducts();
   }
 
   @Get(':productCode')
-  async getProductDetails(@Param() code) {
+  @HttpCode(HttpStatus.OK)
+  async getProductDetails(@Param() code): Promise<ProductDto> {
     return this.appService.getProductDetails(code.productCode);
   }
 
-  @Put(':productCode')
-  async updateProductDetails(@Param() code, @Body() updatedProductDetails) {
-    return this.appService.updateProductDetails(
-      code.productCode,
-      updatedProductDetails,
-    );
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  async addProduct(@Body() createProductDto: CreateProductDto): Promise<void> {
+    await this.appService.addProduct(createProductDto);
   }
 
-  @Post()
-  async addProduct(@Body() body) {
-    await this.appService.addProduct(body);
+  @Put(':productCode')
+  @HttpCode(HttpStatus.OK)
+  async updateProductDetails(
+    @Param() code,
+    @Body() updateProductDto: UpdateProductDto,
+  ): Promise<ProductDto> {
+    return this.appService.updateProductDetails(
+      code.productCode,
+      updateProductDto,
+    );
   }
 }
