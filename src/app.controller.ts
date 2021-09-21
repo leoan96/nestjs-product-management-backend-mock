@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -45,5 +46,11 @@ export class AppController {
       code.productCode,
       updateProductDto,
     );
+  }
+
+  @Delete(':productCode')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteProduct(@Param('productCode') code): Promise<void> {
+    await this.appService.deleteProduct(code);
   }
 }

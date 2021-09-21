@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import * as fs from 'fs';
-import { promisify } from 'util';
 import { DATA_JSON_PATH } from './constants/product.constant';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductDto } from './dto/product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { readProductData } from './helper/app/service.helper';
+import {
+  promisifyWriteFile,
+  readProductData,
+} from './helper/app/service.helper';
 
 @Injectable()
 export class AppService {
@@ -20,7 +21,6 @@ export class AppService {
   }
 
   async addProduct(productDetails: CreateProductDto): Promise<void> {
-    const promisifyWriteFile = promisify(fs.writeFile);
     const dataObj = await readProductData();
     let products = dataObj;
     products = [...products, productDetails];
@@ -37,9 +37,15 @@ export class AppService {
       }
       return product;
     });
-    const promisifyWriteFile = promisify(fs.writeFile);
     const data = JSON.stringify(details);
     await promisifyWriteFile(DATA_JSON_PATH, data);
     return details[0];
+  }
+
+  async deleteProduct(code: string): Promise<void> {
+    const dataObj = await readProductData();
+    const details = dataObj.filter((product) => product.product_code !== code);
+    const data = JSON.stringify(details);
+    await promisifyWriteFile(DATA_JSON_PATH, data);
   }
 }

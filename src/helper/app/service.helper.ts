@@ -12,3 +12,5 @@ export const readProductData = async (): Promise<ProductDto[]> => {
   );
   return products;
 };
+
+export const promisifyWriteFile = promisify(fs.writeFile);
